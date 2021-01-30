@@ -1,0 +1,17 @@
+Dataset:
+We will use corpus from four languages, which include English, Spanish, Russian, and French.
+Since most astaurants are from U.S.A., European Union, and Russia, we believe modelling character frequencies
+of these languages would be helpful in character prediction. 
+For the English dataset, we use a collection of multiple subreddits post and comments provided
+by Cornell: https://convokit.cornell.edu/documentation/subreddit.html.
+For the Spanish dataset, we use a subset of 2010 Spanish Wikipedia articles in XML that are stored on Kaggle
+https://www.kaggle.com/rtatman/120-million-word-spanish-corpus.
+For the Russian dataset, we use a Russian conversation data extracted from hoodlit. There is a copy on GitHub at:
+https://raw.githubusercontent.com/Koziev/NLP_Datasets/master/Conversations/Data/ru.conversations.txt.
+For the French dataset, we use a French dialog corpus extracted from Reddit's public dataset that are stored
+on Kaggle: https://www.kaggle.com/breandan/french-reddit-discussion
+
+Method:
+For now, we are experimenting with Ngram models. We will combine the words from all four datasets,
+tokenize each word, and build Ngram on the characters. We will use the NLTK library in Python to construct
+Ngrams and conduct tokenization.
