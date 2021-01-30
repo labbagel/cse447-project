@@ -2,6 +2,7 @@
 import os
 import string
 import random
+import dill as pickle
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 
@@ -38,12 +39,28 @@ class MyModel:
 
     def run_pred(self, data):
         # your code here
+        with open('./ngram_model.pkl', 'rb') as fin:
+            model = pickle.load(fin)
+        
         preds = []
         all_chars = string.ascii_letters
         for inp in data:
+            top_chars = []
+            top_scores = []
+            for c in all_chars:
+                tup = (c, model.score(c))
+                if len(top_chars) < 3:
+                    top_chars.append(tup[0])
+                    top_scores.append(tup[1])
+                else:
+                    for i in range(3):
+                        if top_scores[i] < model.score(c):
+                            top_chars[i] = tup[0]
+                            top_scores[i] = tup[1]
+                            break
             # this model just predicts a random character each time
-            top_guesses = [random.choice(all_chars) for _ in range(3)]
-            preds.append(''.join(top_guesses))
+#             top_guesses = [random.choice(all_chars) for _ in range(3)]
+            preds.append(''.join(top_chars))
         return preds
 
     def save(self, work_dir):
@@ -51,13 +68,16 @@ class MyModel:
         # this particular model has nothing to save, but for demonstration purposes we will save a blank file
         with open(os.path.join(work_dir, 'model.checkpoint'), 'wt') as f:
             f.write('dummy save')
+        return MyModel()
 
     @classmethod
     def load(cls, work_dir):
         # your code here
+        with open('./ngram_model.pkl', 'rb') as fin:
+            model = pickle.load(fin)
         # this particular model has nothing to load, but for demonstration purposes we will load a blank file
-        with open(os.path.join(work_dir, 'model.checkpoint')) as f:
-            dummy_save = f.read()
+#         with open(os.path.join(work_dir, 'model.checkpoint')) as f:
+#             dummy_save = f.read()
         return MyModel()
 
 
