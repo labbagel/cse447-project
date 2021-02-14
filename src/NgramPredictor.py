@@ -2,7 +2,7 @@ import nltk, os
 import dill
 import pickle
 from nltk.lm import MLE #https://www.nltk.org/api/nltk.lm.html
-from nltk.lm.preprocessing import padded_everygram_pipeline
+from nltk.util import ngrams
 
 class NgramPredictor():
     def __init__(self, n):
@@ -11,10 +11,8 @@ class NgramPredictor():
     
     def add_tokens(self, tokens, vocab, file_name):
         print("Now loading", file_name)
-        print(os.getcwd())
         path = "data\\" + file_name
-        print(path)
-        with open(path, "r") as file:
+        with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
             for line in lines:
                 index = 0
@@ -42,15 +40,15 @@ class NgramPredictor():
         return tokens, vocab
     
     def create_ngrams(self, tokens):
-        ngrams = []
+        ngrams_list = []
         for i in range(self.n):
-            ngrams.append(list())
+            ngrams_list.append(list())
             # index i correponds with i+1 gram
         
         for sentence in tokens:
             for i in range(self.n):
-                ngrams[i].extend(list(ngrams(sentence, i+1)))
-        return ngrams
+                ngrams_list[i].extend(list(ngrams(sentence, i+1)))
+        return ngrams_list
         #unigrams.extend(list(ngrams(sentence, 1)))
         #bigrams.extend(list(ngrams(sentence, 2)))
 
@@ -58,13 +56,16 @@ class NgramPredictor():
         for gram in ngrams:
             self.model.fit([gram], vocabulary_text=vocab)
 
-    def predict(context):
+    def predict(self, context):
         #https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
         #https://www.programiz.com/python-programming/methods/built-in/sorted
         #https://stackoverflow.com/questions/60295058/nltk-mle-model-clarification-trigrams-and-greater
-        predictions = dict(lm.context_counts(lm.vocab.lookup(context)))
+        # Convert predictions into a dictionary
+        predictions = dict(self.model.context_counts(self.model.vocab.lookup(context)))
+        # Sort the predictions by num of occurances (dict.values)
         zipped = sorted(predictions.items(), key=lambda item: item[1], reverse=True)
-        top_three = zipped[0:4] # the first prediction is always space
+        # Get top three
+        top_three = zipped[0:4] # the prediction might contain space
         chars = [top_three[0][0], top_three[1][0], top_three[2][0], top_three[3][0]]
         if ' ' in chars:
             chars.remove(' ')
@@ -82,5 +83,7 @@ class NgramPredictor():
             pickle.dump(variables, f)
     
     def load_model(self, model_path):
+        # Change your model name here
+        model_path += '\\ngram_model_alan.pkl'
         with open(model_path, 'rb') as fin:
             self.model = dill.load(fin)

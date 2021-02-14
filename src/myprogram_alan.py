@@ -6,6 +6,12 @@ import dill as pickle
 from NgramPredictor import NgramPredictor
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
+def load_precomputed_data():
+    path = "data\\" + "tokens_and_vocab.pkl"
+    with open(path, 'rb') as f:  # Python 3: open(..., 'rb')
+        tokens, vocab = pickle.load(f)
+    return tokens, vocab
+
 
 def main():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
@@ -24,8 +30,12 @@ def main():
         print('Instantiating model')
         model = NgramPredictor(n=2)
         print('Loading training data')
-        tokens, vocab = model.load_training_data(["english_dataset.txt", "russian_dataset.txt",
-                                                "french_dataset.txt", "spanish_dataset.txt"])
+        # Option 1: Compute again:
+        #tokens, vocab = model.load_training_data(["english_dataset.txt", "russian_dataset.txt",
+        #                                        "french_dataset.txt", "spanish_dataset.txt"])
+        # Option 2: Load precomputed
+        tokens, vocab = load_precomputed_data()
+        print('Creating_ngrams')
         ngrams = model.create_ngrams(tokens)
         print('Training')
         model.fit(ngrams, vocab)
@@ -34,9 +44,10 @@ def main():
     elif args.mode == 'test':
         print('Loading model')
         model = NgramPredictor(n=2)
-        model.load(args.work_dir)
+        model.load_model(args.work_dir)
         print('Loading test data from {}'.format(args.test_data))
         
+        # Source: https://github.com/Bharath-K3/Next-Word-Prediction-with-NLP-and-Deep-Learning/blob/master/Predictions-1.ipynb
         while(True):
             text = input("Enter your line: ")
             
@@ -45,7 +56,7 @@ def main():
                 break
             else:
                 try:
-                    pred = model.predict(text[-1])
+                    pred = model.predict(list(text[-1]))
                     print(pred)
                 except:
                     continue
