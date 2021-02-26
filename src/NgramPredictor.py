@@ -15,20 +15,12 @@ class NgramPredictor():
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
             for line in lines:
-                index = 0
-                sentence = []
-                # start from the index of a character
-                while index < len(line) and line[index] == " ":
-                    index += 1
-                # start storing sentence
-                while index < len(line):
-                    vocab.add(line[index])
-                    sentence.append(line[index])
-                    if (index > 0 and line[index] == " " and line[index - 1] != " "):
-                        wordcount += 1
-                    index += 2
-                if len(sentence) != 0:
-                    tokens.append(sentence)
+            # Convert line (String) into a list
+            line_list = list(line)
+            tokens.append(line_list)
+            for c in line_list:
+                # Loop thru the line to add the vocab
+                vocab.add(c)
         print("Done!")
 
     def load_training_data(self, datasets):
